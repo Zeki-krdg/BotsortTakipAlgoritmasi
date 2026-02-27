@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# YOLO / Dataset
+dataset/
+runs/**
+!runs/detect/
+!runs/detect/yolov8_kamikaze_960/
+!runs/detect/yolov8_kamikaze_960/weights/
+!runs/detect/yolov8_kamikaze_960/weights/best.pt
+video/**/*.mp4
+video/**/*.avi
+!video/kamikaze.mp4
+
+# IDE
+.vscode/
+.idea/
