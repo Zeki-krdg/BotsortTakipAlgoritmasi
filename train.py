@@ -15,7 +15,7 @@ def main():
         # ===== TEMEL AYARLAR =====
         epochs=80,              # Tiny object için daha uzun eğitim
         imgsz=960,               # Yüksek çözünürlük (küçük drone için)
-        batch=8,                 # 960'da 8 daha stabil (GPU'ya göre 8–16)
+        batch=12,                 # 960'da 8 daha stabil (GPU'ya göre 8–16)
         device=0,
 
         # ===== STABİLİTE =====

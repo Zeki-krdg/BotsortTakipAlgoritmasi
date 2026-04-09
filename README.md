@@ -1,28 +1,56 @@
-# Fixed Wing UAV - Kamikaze Detection
+# BlackBox - Sabit Kanatlı İHA Takip Sistemi
 
-Bu proje, YOLOv8 kullanılarak sabit kanatlı İHA'ların (Kamikaze) tespiti için geliştirilmiştir.
+Bu proje, sabit kanatlı İHA'lar (Kamikaze dronlar) için geliştirilmiş, yüksek performanslı bir hibrit nesne takip sistemidir. **YOLOv8**'in tespit gücünü, **OSTrack (One-Stream Tracking)** algoritmasının gelişmiş Transformer tabanlı takip yeteneğiyle birleştirir.
 
-## Proje Yapısı
-- `train.py`: Modeli eğitmek için kullanılan script.
-- `predict_video.py`: Eğitilmiş model ile video üzerinde test yapmak için kullanılır.
-- `runs/detect/yolov8_kamikaze_960/weights/best.pt`: Eğitilmiş en iyi model ağırlıkları.
+## 🚀 Özellikler
+- **OSTrack Implementation:** Makaledeki (Ye et al.) orijinal Vision Transformer (ViT) mimarisi üzerine kurulu tam sürüm takip algoritması.
+- **YOLOv8 Entegrasyonu:** Hedefin ilk tespiti ve takip kaybı durumunda otomatik yeniden yakalama.
+- **Hibrit Takip (Handshake):** YOLO (Tespit) ve OSTrack (Takip) arasında güven skoruna dayalı akıllı geçiş mekanizması.
+- **FailSafe Protokolü:** Takip kalitesi düştüğünde sistemin çökmesini engelleyen ani kurtarma sistemi.
+- **Hareket Tutarlılığı Filtresi:** Koordinat sıçramalarını engelleyerek drift (sapma) sorununu minimize eder.
 
-## Kurulum
-1. Repoyu klonlayın:
-   ```bash
-   git clone https://github.com/ferhat-yldz/fixedWingUav.git
-   cd fixedWingUav
-   ```
-2. Gerekli kütüphaneleri kurun:
-   ```bash
-   pip install ultralytics
-   ```
+## 📦 Gereksinimler
 
-## Dataset
-Dataset boyutu büyük olduğu için GitHub'a yüklenmemiştir. Projeyi yeniden eğitmek isterseniz dataseti [BURAYA LİNK GELECEK] adresinden indirip `dataset/` klasörüne yerleştirmeniz gerekmektedir.
+Projenin çalışması için Python 3.8+ gereklidir. Gerekli kütüphaneleri aşağıdaki komutla yükleyebilirsiniz:
 
-## Kullanım
-Video üzerinde tahmin yürütmek için:
 ```bash
-python predict_video.py
+pip install torch torchvision torchaudio
+pip install ultralytics
+pip install opencv-python
+pip install numpy
 ```
+
+## 🛠️ Kurulum ve Hazırlık
+
+1. **Depoyu klonlayın:**
+   ```bash
+   git clone https://github.com/ferhat-yldz/BlackBox.git
+   cd BlackBox
+   ```
+
+2. **Ağırlık Dosyaları:**
+   - YOLOv8 modelinizi (`best.pt`) şu dizine yerleştirin: `runs/detect/yolov8_kamikaze_960/weights/`
+   - (Opsiyonel) OSTrack transformer ağırlıklarını (`.pth`) ana dizine ekleyip ilgili scriptlerden yollarını güncelleyebilirsiniz.
+
+## 🏃 Nasıl Çalıştırılır?
+
+### 1. Ana Hibrit Takip Sistemi
+YOLO ile tespit yapan ve OSTrack ile takip eden ana sistemi başlatmak için:
+```bash
+python ostracktry.py
+```
+
+### 2. Standalone OSTrack Testi
+OSTrack modelini manuel alan seçimi (ROI) ile bağımsız olarak test etmek için:
+```bash
+python ostrack_test.py
+```
+
+## 📂 Proje Yapısı
+- `ostrack_model.py`: Vision Transformer (ViT) tabanlı takip mimarisinin PyTorch kodları.
+- `ostrackAlgorithm.py`: Takip mantığını, ön işlemeyi ve model yönetimini sağlayan arayüz sınıfı.
+- `ostracktry.py`: YOLO + OSTrack hibrit sisteminin ana giriş noktası.
+- `ostrack_test.py`: Manuel takip doğrulaması için kullanılan test betiği.
+
+## 📝 Lisans
+Bu proje eğitim ve araştırma amaçlı geliştirilmiştir.

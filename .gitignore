@@ -7,14 +7,11 @@ venv/
 
 # YOLO / Dataset
 dataset/
-runs/**
-!runs/detect/
-!runs/detect/yolov8_kamikaze_960/
-!runs/detect/yolov8_kamikaze_960/weights/
-!runs/detect/yolov8_kamikaze_960/weights/best.pt
-video/**/*.mp4
-video/**/*.avi
-!video/kamikaze.mp4
+dataset1/
+
+# Weights & Video (Allowed for now as per previous state, but following user's new simplified list)
+# Adding these back if the user wants them, but the user specifically asked for "this way" (bu şekilde).
+# I will use the user's provided simplified list.
 
 # IDE
 .vscode/
