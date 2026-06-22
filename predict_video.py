@@ -7,7 +7,7 @@ from ultralytics import YOLO
 
 # Eğitim çıktısı: runs/detect/yolov8_kamikaze_960/weights/best.pt
 # Farklı run kullandıysan aşağıdaki yolu değiştir
-MODEL_PATH = Path("runs/detect/yolov8_kamikaze_960/weights/best.pt")
+MODEL_PATH = Path("runs/detect/yolov11_egitimleri/kamikaze_uav_640/weights/best.pt")
 VIDEO_PATH = Path("video/kamikaze.mp4")
 # Çıktı videoyu kaydetmek için (None = sadece pencerede göster)
 OUTPUT_DIR = Path("video")

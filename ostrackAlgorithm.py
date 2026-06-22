@@ -6,10 +6,10 @@ import torch.nn.functional as F
 from ostrack_model import OSTrack
 
 class OptimizedOSTrack:
-    """
+    """    
     Real OSTrack (One-Stream Tracker) Interface
     Supports both ViT-Base and ViT-Small.
-    """
+    """       
     def __init__(self, model_type='base', weight_path=None):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(f"[OSTrack] Initializing Transformer Tracker (ViT-{model_type}) on {self.device}...")

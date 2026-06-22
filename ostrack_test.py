@@ -6,7 +6,7 @@ from ostrackAlgorithm import OptimizedOSTrack
 
 # ----------------------- CONFIG (edit here only) -----------------------
 VIDEO_PATH = Path("video/kamikaze.mp4")
-YOLO_WEIGHTS = Path("runs/detect/yolov8_kamikaze_960/weights/best.pt")
+YOLO_WEIGHTS = Path("runs/detect/yolov11_egitimleri/kamikaze_uav_640/weights/best.pt")
 
 # Leave as empty string to disable OSTrack model and use YOLO-first tracking.
 OSTRACK_WEIGHTS = ""
