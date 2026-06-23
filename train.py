@@ -2,6 +2,7 @@
 YOLO11 ile kamikaze (fixed-wing UAV) tespiti eğitimi.
 Veri seti: Roboflow Kamikaze UAV Dataset (dataset/data.yaml)
 """
+# pyrefly: ignore [missing-import]
 from ultralytics import YOLO
 from multiprocessing import freeze_support
 

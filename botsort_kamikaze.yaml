@@ -1,0 +1,49 @@
+# BOT-SORT Konfigürasyonu - Kamikaze İHA Takibi
+# Ultralytics dahili BOT-SORT tracker ayarları
+# Kullanım: model.track(source=..., tracker="botsort_kamikaze.yaml")
+
+tracker_type: botsort
+
+# ── Eşleştirme Eşikleri ──────────────────────────────────────────────────
+# 1. aşama: Yüksek güvenli tespitler ile mevcut izlerin IoU eşleştirmesi
+track_high_thresh: 0.25
+
+# 2. aşama: Düşük güvenli tespitler ile kalan izlerin eşleştirmesi
+# Kamikaze küçük olduğu için düşük tutarak kaçırılmasını engelliyoruz
+track_low_thresh: 0.1
+
+# Yeni iz başlatmak için minimum güven skoru
+new_track_thresh: 0.25
+
+# IoU eşleştirme eşiği (ne kadar örtüşme gerektiği)
+match_thresh: 0.8
+
+# Tespit skoru ile hareket/IoU skorunu birleştir (zayıf tespitleri stabilize eder)
+fuse_score: true
+
+# ── İz Ömrü ──────────────────────────────────────────────────────────────
+# Hedef kaybolduğunda kaç kare boyunca iz korunsun
+# 30 kare ≈ 1 saniye (30 FPS videoda)
+# Kamikaze kısa süre kaybolabilir (bulut, parlama), bu süre yeterli
+track_buffer: 30
+
+# ── Kalman Filtresi & Eşleştirme ─────────────────────────────────────────
+# Yakınlık eşiği (Kalman tahminleri ile tespit mesafesi)
+proximity_thresh: 0.5
+
+# Görünüm benzerlik eşiği (ReID aktifse kullanılır)
+appearance_thresh: 0.8
+
+# ── Kamera Hareketi Telafisi (CMC) ───────────────────────────────────────
+# İHA'nın kendi hareketinden kaynaklanan arka plan kaymasını telafi eder
+# Seçenekler: sparseOptFlow, orb, ecc, none
+gmc_method: sparseOptFlow
+
+# ── Re-ID (Görünüm Tabanlı Yeniden Tanıma) ──────────────────────────────
+# Tek nesne takibi için kapalı tutulabilir
+# Birden fazla İHA takibi gerekirse true yapın
+with_reid: false
+
+# ReID model yolu — "auto" dedektör özelliklerini kullanır
+model: auto
+
