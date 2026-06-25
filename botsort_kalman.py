@@ -46,22 +46,27 @@ class KalmanBoxTracker:
         self.F = np.eye(self.dim_x, dtype=np.float64)
         self.F[0, 4] = 1.0  # cx += vx
         self.F[1, 5] = 1.0  # cy += vy
-        self.F[2, 6] = 1.0  # w  += vw
-        self.F[3, 7] = 1.0  # h  += vh
+        # Kutu boyutu (w, h) tahmini KAPATILDI! 
+        # Böylece kutu boyutu kendi kendine büyüyüp küçülmeyecek, sadece YOLO'dan gelen boyutta kalacak.
+        # self.F[2, 6] = 1.0  
+        # self.F[3, 7] = 1.0  
 
         # H: Ölçüm matrisi
         self.H = np.zeros((self.dim_z, self.dim_x), dtype=np.float64)
-        np.fill_diagonal(self.H, 1.0)
+        self.H[0, 0] = 1.0
+        self.H[1, 1] = 1.0
+        self.H[2, 2] = 1.0
+        self.H[3, 3] = 1.0
 
-        # P: Başlangıç durum belirsizliği
+        # P: Başlangıç hata kovaryansı
         self.P = np.diag([10, 10, 10, 10, 100, 100, 25, 25]).astype(np.float64)
 
-        # Q: Proses gürültüsü — hız yüksek (drone ani manevra yapar)
-        self.Q = np.diag([1, 1, 0.5, 0.5, 16, 16, 0.5, 0.5]).astype(np.float64)
+        # Q: Proses gürültüsü
+        self.Q = np.diag([1, 1, 0.5, 0.5, 16, 16, 0.0, 0.0]).astype(np.float64)
 
         # R: Ölçüm gürültüsü — YOLO tespiti ÇOK GÜVENİLİR
-        # Değerleri çok düşürdük, böylece YOLO gördüğü an kutu SİHA'ya tam yapışacak
-        self.R = np.diag([0.5, 0.5, 1.0, 1.0]).astype(np.float64)
+        # w ve h için 0.01 veriyoruz ki Kalman eski boyutunu unutup direkt YOLO'nun verdiği boyuta %100 kilitlensin.
+        self.R = np.diag([0.5, 0.5, 0.01, 0.01]).astype(np.float64)
 
         self.time_since_update = 0
         self.hits = 0
