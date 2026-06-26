@@ -23,7 +23,7 @@ from botsort_kalman import KalmanBoxTracker, iou
 import sys
 
 # ── Ayarlar ───────────────────────────────────────────────────────────────
-MODEL_PATH = Path(r"runs\detect\yolov11_egitimleri\best_yolo11n.pt")
+MODEL_PATH = Path(r"C:\Users\ZEKİ\Desktop\BotsortTakipAlgoritmasi\runs\detect\yolov11_egitimleri\best_yolo11n.pt")
 
 # Eğer komut satırından video verilmişse onu kullan, yoksa varsayılanı kullan
 if len(sys.argv) > 1:
@@ -32,7 +32,7 @@ else:
     VIDEO_PATH = Path("video/kamikaze.mp4")
 
 YOLO_CONF = 0.30             # 0.15 idi  YOLO güven eşiği (daha çok tespit, daha iyi kilitlenme)
-DETECT_INTERVAL = 2        # TRACK modunda kaç karede bir YOLO çalıştır (Daha sık kontrol = Kopmaz kilit)
+DETECT_INTERVAL = 10        # TRACK modunda kaç karede bir YOLO çalıştır (Daha sık kontrol = Kopmaz kilit)
 MATCH_DIST_THRESH = 100.0     # YOLO tespitini kabul etmek için max merkez mesafesi (Hızlı SİHA için genişlettik)
 MAX_MISSED_DETECTIONS = 30    # Kaç YOLO döngüsü hedefi bulamazsa SEARCH'e dön (Hemen pes etme)
 
