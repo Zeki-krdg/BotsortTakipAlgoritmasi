@@ -118,6 +118,8 @@ def main():
     lock_start_time = None
     ignored_trackers = []      # 4 sn kilitlenilen hedefleri saklar
     show_success_text = False  # Kilitlenme başarılı yazısının kalıcılığını tutar
+    next_id = 1
+    active_id = None
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -161,7 +163,7 @@ def main():
                 active_ignored.append(ign)
                 ign_bbox = ign_k.get_bbox()
                 ignored_boxes_to_exclude.append(ign_bbox)
-                ignored_boxes_to_draw.append(ign_bbox)
+                ignored_boxes_to_draw.append({'bbox': ign_bbox, 'id': ign.get('id', '?')})
                 
         ignored_trackers = active_ignored
 
@@ -217,7 +219,9 @@ def main():
                 missed_detections = 0
                 draw_bbox = best_box
                 last_yolo_conf = best_conf
-                print(f"[Kare {frame_count:04d}] HEDEF BULUNDU → TRACK moduna geçildi (conf: {best_conf:.2f})")
+                active_id = next_id
+                next_id += 1
+                print(f"[Kare {frame_count:04d}] HEDEF BULUNDU → TRACK moduna geçildi (conf: {best_conf:.2f}, ID: {active_id})")
 
         # ==============================================================
         #  TRACK MODU: Kalman tahmin + aralıklı YOLO düzeltme
@@ -245,7 +249,8 @@ def main():
                 missed_detections = 0
                 draw_bbox = None
                 lock_start_time = None
-                print(f"[Kare {frame_count:04d}] KİLİT ZAYIFLADI (<%50) → SEARCH moduna geçildi")
+                print(f"[Kare {frame_count:04d}] KİLİT ZAYIFLADI (<%50) → SEARCH moduna geçildi (Eski ID: {active_id})")
+                active_id = None
 
         # ==============================================================
         #  ÇİZİM
@@ -265,7 +270,14 @@ def main():
         scale_y = win_h / img_h
 
         # Ignored boxes çizimi
-        for ign_bbox in ignored_boxes_to_draw:
+        for ign_info in ignored_boxes_to_draw:
+            if isinstance(ign_info, dict):
+                ign_bbox = ign_info['bbox']
+                ign_id = ign_info['id']
+            else:
+                ign_bbox = ign_info
+                ign_id = "?"
+
             ix1, iy1, ix2, iy2 = map(int, ign_bbox)
             icx = (ix1 + ix2) / 2.0
             icy = (iy1 + iy2) / 2.0
@@ -283,18 +295,18 @@ def main():
 
             color = (0, 165, 255) # Turuncu
             cv2.rectangle(frame, (s_ix1, s_iy1), (s_ix2, s_iy2), color, 2)
-            cv2.putText(frame, "Ayni Siha", (s_ix1, max(20, s_iy1 - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.putText(frame, f"Ayni Siha ID:{ign_id}", (s_ix1, max(20, s_iy1 - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
             cv2.putText(frame, "HH", (s_icx - 10, s_icy + 4), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
-        cv2.putText(frame, "AK: Kamera Gorus Alani", (10, 20),
+        cv2.putText(frame, "AK:", (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
         s_av_x1, s_av_y1 = int(av_x1 * scale_x), int(av_y1 * scale_y)
         s_av_x2, s_av_y2 = int(av_x2 * scale_x), int(av_y2 * scale_y)
 
         cv2.rectangle(frame, (s_av_x1, s_av_y1), (s_av_x2, s_av_y2), (0, 255, 255), 2)
-        cv2.putText(frame, "AV: Hedef Vurus Alani", (s_av_x1, s_av_y1 - 5),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+        cv2.putText(frame, "AV:", (s_av_x1, s_av_y1 - 5),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1)
 
         if draw_bbox is not None and STATE == "TRACK":
             x1, y1, x2, y2 = draw_bbox
@@ -327,22 +339,22 @@ def main():
             
             if conf > 0.5 and is_inside_av and is_large_enough:
                 color = (0, 0, 255)       
-                text_ah = f"AH: Kilitlenme Dortgeni (Gecerli: {conf:.2f})"
+                text_ah = f"AH: (Gecerli: {conf:.2f}) ID:{active_id}"
                 if lock_start_time is None:
                     lock_start_time = time.time()
                     show_success_text = False
 
             else:
                 color = (0, 165, 255)     
-                text_ah = f"AH: Kilitlenme Dortgeni (Gecersiz: {conf:.2f})"
+                text_ah = f"AH: (Gecersiz: {conf:.2f}) ID:{active_id}"
                 lock_start_time = None
 
             cv2.rectangle(frame, (s_x1, s_y1), (s_x2, s_y2), color, 2)
             cv2.putText(frame, text_ah, (s_x1, s_y1 - 8),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
             
             cv2.putText(frame, f"YOLO Conf: {last_yolo_conf:.2f}", (s_x1, s_y2 + 18),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
 
             cv2.putText(frame, "HH", (s_cx - 10, s_cy + 4),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
@@ -356,7 +368,7 @@ def main():
                 cv2.imwrite(snap_name, frame)
                 print(f"[BİLGİ] 4 saniye kilitlenildi. Görüntü kaydedildi: {snap_name}")
                 
-                ignored_trackers.append({'kalman': kalman, 'missed': 0})
+                ignored_trackers.append({'kalman': kalman, 'missed': 0, 'id': active_id})
                 STATE = "SEARCH"
                 kalman = None
                 draw_bbox = None
@@ -366,11 +378,11 @@ def main():
                 counter_text = f"{elapsed:.1f} sn"
                 text_color = (0, 0, 255)
                 cv2.putText(frame, counter_text, (s_av_x2 - 180, s_av_y1 + 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, text_color, 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, text_color, 1)
                             
         if show_success_text:
             cv2.putText(frame, "Kilitlenme Basarili!", (s_av_x2 - 250, s_av_y1 + 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 1)
 
         # FPS ve durum
         now = time.time()
@@ -378,10 +390,10 @@ def main():
         prev_time = now
 
         cv2.putText(frame, f"FPS: {fps:.1f}", (20, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 1)
         cv2.putText(frame, f"STATE: {STATE}", (20, 75),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7,
-                    (0, 255, 0) if STATE == "TRACK" else (0, 0, 255), 2)
+                    (0, 255, 0) if STATE == "TRACK" else (0, 0, 255), 1)
 
         if frame_count % 50 == 0:
             print(f"[Kare {frame_count:04d}/{total_frames}] {STATE} | FPS: {fps:.1f} | Miss: {missed_detections}")
